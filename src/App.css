@@ -1,0 +1,13 @@
+header {
+  text-align: center;
+}
+
+nav a {
+  color: #000;
+  display: inline-block;
+  margin: 0 10px;
+  text-decoration: none;
+}
+nav a:hover {
+  text-decoration: underline;
+}
