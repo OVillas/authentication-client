@@ -1,8 +1,9 @@
-import axios from 'axios'
-import { SignInCredencional } from '../types/SignInCredencional'
-import { User } from '../types/User'
+import axios, { AxiosResponse } from 'axios'
 import { jwtDecode } from 'jwt-decode'
 import { ErrorResponse } from '../types/ErrorResponse'
+import { SignInCredencional } from '../types/SignInCredencional'
+import { User } from '../types/User'
+import { AuthState } from '../utils/authState'
 
 const api = axios.create({
     baseURL: 'http://localhost:8080/v1',
@@ -13,9 +14,10 @@ type SignInResponse = {
     token: string
 }
 
+
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('authToken')
+        const token = AuthState.getToken()
         if (token) {
             if (!config.headers) {
                 config.headers = {}
@@ -35,8 +37,8 @@ api.interceptors.response.use(
     },
     (error) => {
         if (error.response && error.response.status === 401) {
-            localStorage.removeItem('authToken')
-            window.location.href = '/login'
+            AuthState.removeToken()
+            window.location.href = '/signIn'
         }
         return Promise.reject(error)
     }
@@ -44,14 +46,14 @@ api.interceptors.response.use(
 
 export const useApi = () => ({
     recoveryUserInformation: async (): Promise<User> => {
-        const response = await api.get('/user')
+        const response: AxiosResponse<User | ErrorResponse> = await api.get('/user')
 
         if (response.status === 200) {
             return response.data as User
         }
 
         const errorResponse = response.data as ErrorResponse
-        throw new Error(errorResponse.Message)
+        throw new Error(errorResponse.message)
     },
 
     signin: async ({
@@ -62,24 +64,27 @@ export const useApi = () => ({
             username,
             password,
         })
-
         if (response.status === 200) {
+
+            const token: string = response.data
             api.defaults.headers.common[
                 'Authorization'
-            ] = `Bearer ${response.data}`
-            
-            const user = jwtDecode<User>(response.data)
-            
-            return { user, token: response.data }
+            ] = `Bearer ${token}`
+
+            const payload = jwtDecode(token) as User
+
+            return {
+                user: payload,
+                token: token,
+            }
         }
 
         const errorResponse = response.data as ErrorResponse
-        throw new Error(errorResponse.Message)
+        throw new Error(errorResponse.message)
     },
 
     logout: async () => {
         delete api.defaults.headers.common['Authorization']
-        const response = await api.post('/logout')
-        return response.data
+        return true
     },
 })

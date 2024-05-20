@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { Login } from '../../pages/Login';
 import { AuthContext } from './AuthContext';
+import { Navigate } from 'react-router-dom';
 
 export const RequireAuth = ({ children }: { children: JSX.Element }) => {
     const { user, loading } = useContext(AuthContext);
@@ -10,7 +10,7 @@ export const RequireAuth = ({ children }: { children: JSX.Element }) => {
     }
 
     if (!user) {
-        return <Login />;
+        return <Navigate to="/signIn" />;
     }
 
     return children;

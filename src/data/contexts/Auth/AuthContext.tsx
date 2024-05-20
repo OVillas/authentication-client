@@ -4,7 +4,7 @@ import { SignInCredencional } from '../../types/SignInCredencional';
 
 export type AuthContextType = {
     user: User | null;
-    signin: ({username, password}: SignInCredencional) => Promise<boolean>;
+    signin: ({username, password}: SignInCredencional) => Promise<{authenticated: boolean, path: string}>;
     signout: () => void;
     loading: boolean;
 }

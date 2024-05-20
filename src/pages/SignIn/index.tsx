@@ -1,8 +1,10 @@
 import { ChangeEvent, useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AuthContext } from '../../contexts/Auth/AuthContext'
+import Cycle from '../../assets/images/png/cycle.png'
+import { AuthContext } from '../../data/contexts/Auth/AuthContext'
+import PrimaryUserInput from '../../ui/components/inputs/UserForm/PrimaryUserInput'
 
-export const Login = () => {
+export const SignIn = () => {
     const auth = useContext(AuthContext)
     const navigate = useNavigate()
 
@@ -21,20 +23,19 @@ export const Login = () => {
         e.preventDefault()
         if (!username && !password) alert('Please fill in the fields')
 
-        const isLogged = await auth.signin({ username, password })
-        if (isLogged) {
-            navigate('/')
-        } else {
-            alert('Invalid credentials')
+        const response = await auth.signin({ username, password })
+        if (response.authenticated) {
+            alert(response.path)
+            navigate(response.path)
         }
     }
 
     return (
         <div className="bg-gray-300 w-full h-screen flex items-center justify-center">
-            <div className="bg-white w-full flex-1 max-w-sm h-screen sm:h-[40rem] px-3 shadow-xl">
+            <div className="bg-white w-full flex-1 max-w-sm h-screen sm:h-[48rem] md:h-[40rem] px-3 shadow-xl">
                 <div className="px-6 py-8 mb-6">
                     <h3 className="text-primary-app-color text-2xl font-semibold">
-                        Digital
+                        Pulse <span className="text-gray-500">Tech</span>
                     </h3>
                 </div>
                 <form className="flex flex-col gap-5 w-full max-w-4xl px-3">
@@ -45,39 +46,22 @@ export const Login = () => {
                     <p className="text-gray-500 text-xs self-start max-w-2xl">
                         Welcome back! Please login to your account.
                     </p>
-                    <div className="flex flex-col m2-2 w-full">
-                        <label
-                            className="block text-gray-700 text-md font-bold mb-2 ml-1"
-                            htmlFor="username"
-                        >
-                            E-mail
-                        </label>
-                        <input
-                            type="text"
-                            id="username"
-                            value={username}
-                            onChange={handleUsernameInput}
-                            className="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-primary-app-color"
-                            placeholder="Enter your e-mail"
-                            required
-                            autoFocus
-                        />
-                    </div>
+                    <PrimaryUserInput
+                        labelContent="E-mail"
+                        inputType="text"
+                        placeholder="Enter your e-mail"
+                        value={username}
+                        onChange={handleUsernameInput}
+                        autoFocus = {true}
+                    />
+
                     <div className="flex flex-col w-full">
-                        <label
-                            className="block text-gray-700 text-md font-bold mb-2 ml-1"
-                            htmlFor="password"
-                        >
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
+                        <PrimaryUserInput
+                            labelContent="Password"
+                            inputType="password"
+                            placeholder="Enter your password"
                             value={password}
                             onChange={handlePasswordInput}
-                            className="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-primary-app-color"
-                            placeholder="Enter your password"
-                            required
                         />
                         <div className="flex justify-between px-2 py-3 items-center">
                             <div className="flex items-center">
@@ -102,44 +86,46 @@ export const Login = () => {
                             </a>
                         </div>
                     </div>
-                    <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center justify-between mt-2 flex-wrap">
                         <button
-                            className="bg-primary-app-color hover:bg-blue-500 duration-500 text-white font-bold py-2 px-12 rounded focus:outline-none focus:shadow-outline"
+                            className="bg-primary-app-color hover:bg-blue-500 duration-500 text-white font-bold py-2 px-12 sm:px-5 md:px-12 rounded focus:outline-none focus:shadow-outline"
                             type="submit"
                             onClick={handleLogin}
                         >
                             Sign In
                         </button>
 
-                        <button className="border-solid border-2 border-primary-app-color hover:bg-primary-app-color hover:text-white duration-500 text-black font-bold py-2 px-12 rounded focus:outline-none focus:shadow-outline">
+                        <a href='/signUp' className="border-solid border-2 border-primary-app-color hover:bg-primary-app-color hover:text-white duration-500 text-black font-bold py-2 px-12 sm:px-5 md:px-12 rounded focus:outline-none focus:shadow-outline">
                             Sign Up
-                        </button>
+                        </a>
                     </div>
-                    <div className="w-full max-w-7xl mx-auto grid grid-cols-3 sm:grid-cols-4 ml-4 gap-2 sm:gap-5 mt-3 items-center">
+                    <div className="w-full max-w-7xl mx-auto grid grid-cols-3 sm:grid-cols-4 ml-4 gap-2 sm:gap-5 mt-3 items-center flex-wrap sm:flex sm:flex-col md:flex-row">
                         <span className="text-sm">login with</span>
-                        <a
-                            href="#"
-                            className="text-primary-app-color font-semibold hover:text-blue-500 duration-500"
-                        >
-                            Facebook
-                        </a>
-                        <a
-                            href="#"
-                            className="text-primary-app-color font-semibold hover:text-blue-500 duration-500"
-                        >
-                            LinkedIn
-                        </a>
-                        <a
-                            href="#"
-                            className="text-primary-app-color font-semibold hover:text-blue-500 duration-500"
-                        >
-                            Google
-                        </a>
+                        <div className='flex items-center gap-2 sm:gap-5'>
+                            <a
+                                href="#"
+                                className="text-primary-app-color font-semibold hover:text-blue-500 duration-500"
+                            >
+                                Facebook
+                            </a>
+                            <a
+                                href="#"
+                                className="text-primary-app-color font-semibold hover:text-blue-500 duration-500"
+                            >
+                                LinkedIn
+                            </a>
+                            <a
+                                href="#"
+                                className="text-primary-app-color font-semibold hover:text-blue-500 duration-500"
+                            >
+                                Google
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
 
-            <div className="bg-gray-100 w-full hidden sm:flex flex-1 flex-col max-w-xl h-screen sm:h-[40rem] items-center py-12 shadow-lg">
+            <div className="bg-gray-100 w-full hidden sm:flex flex-1 flex-col max-w-xl h-screen sm:h-[48rem] md:h-[40rem] items-center py-12 shadow-lg">
                 <nav className="flex items-center gap-12 mb-8">
                     <a href="#" className="text-gray-600 hover:underline">
                         Home
@@ -155,8 +141,8 @@ export const Login = () => {
                     </a>
                 </nav>
                 <img
-                    src="./assets/cycle.png"
-                    alt="Image of a cyclist"
+                    src={Cycle}
+                    alt="Image of a person on a bicycle, also called a cyclist"
                     className="w-full h-96 mt-8"
                 />
             </div>
